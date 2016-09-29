@@ -1,5 +1,11 @@
 import os, random, sys, socket, time
 
+try:
+    import winsound
+    platform = "windows"
+except:
+    platform = "gnulinux"
+
 def print_board():
     for n in range(0, 9, 3):
         print(board[n] + "|" + board[n+1] + "|" + board[n+2] + "  ", n+1, "|", n+2, "|", n+3, sep="")
@@ -15,10 +21,10 @@ def clear():
     if idle:
         print("\n"*80)
     else:
-        try:
-            os.system("cls")
-        except:
+        if platform == "gnulinux":
             os.system("clear")
+        else:
+            os.system("cls")
 
 def ai_place(c):
     available_spots = []

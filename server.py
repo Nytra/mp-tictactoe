@@ -123,13 +123,19 @@ def client():
                                         if int(response) in range(9):
                                             index = int(response)
                                             print("Got position:", index+1)
-                                            board[index] = this_turn.get_counter()
-                                            print_board()
-                                            winner = check_win().split()
-                                            if this_turn == match:
-                                                this_turn = client
+                                            if board[index] == " ":
+                                                board[index] = this_turn.get_counter()
+                                                print_board()
+                                                winner = check_win().split()
+                                                if this_turn == match:
+                                                    this_turn = client
+                                                else:
+                                                    this_turn = match
                                             else:
-                                                this_turn = match
+                                                print("Invalid position.")
+                                                this_turn.c.send("invalid_pos||{}||{}".format(this_turn.get_counter(),
+                                                                                              ",".join(x for x in
+                                                                                                       board)).encode())
                                         else:
                                             this_turn.c.send("invalid_pos||{}||{}".format(this_turn.get_counter(), ",".join(x for x in board)).encode())
                                 print(winner, "wins!")
