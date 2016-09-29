@@ -109,11 +109,14 @@ def offline():
     quit()
 
 def connect():
+    clear()
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server = input("Server address: ")
     port = 45001
     data_buf = 4096
+    print("Attempting to connect to server...")
     s.connect((server, port))
+    print("Connection established.")
     print("Searching for an opponent...")
     while True:
         data = s.recv(data_buf)
@@ -121,7 +124,8 @@ def connect():
             break
         response = data.decode("utf-8")
         if response == "ready":
-            print("Opponent found...")
+            print("Opponent found.")
+            print("Waiting for opponent to make the first move...")
             while True:
                 data = s.recv(data_buf)
                 if not data:
@@ -129,6 +133,7 @@ def connect():
                 response = data.decode("utf-8")
                 clear()
                 print_board()
+                print("Waiting for opponent to make a move...")
                 if "go" in response or "invalid_pos" in response:
                     c = response.split("||")[1] # counter
                     b = response.split("||")[2] # board raw data
@@ -148,6 +153,7 @@ def connect():
                     place(c, i)
                     clear()
                     print_board()
+                    print("Waiting for opponent to make a move...")
                 elif "over" in response:
                     c = response.split("||")[1]  # counter
                     b = response.split("||")[2]  # board raw data
