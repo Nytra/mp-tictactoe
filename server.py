@@ -62,6 +62,29 @@ def print_board():
     for n in range(0, 9, 3):
         print(board[n] + "|" + board[n+1] + "|" + board[n+2] + "  ", n+1, "|", n+2, "|", n+3, sep="")
 
+def check_win():
+    global board
+    empty = " "
+    b = board
+    if b[0] == b[1] and b[0] == b[2] and b[0] != empty:
+        return b[0]
+    elif b[0] == b[3] and b[0] == b[6] and b[0] != empty:
+        return b[0]
+    elif b[0] == b[4] and b[0] == b[8] and b[0] != empty:
+        return b[0]
+    elif b[1] == b[4] and b[1] == b[7] and b[1] != empty:
+        return b[1]
+    elif b[2] == b[5] and b[2] == b[8] and b[2] != empty:
+        return b[2]
+    elif b[3] == b[4] and b[3] == b[5] and b[3] != empty:
+        return b[3]
+    elif b[6] == b[4] and b[6] == b[2] and b[6] != empty:
+        return b[6]
+    elif b[6] == b[7] and b[6] == b[8] and b[6] != empty:
+        return b[6]
+    else:
+        return empty
+
 def client():
     global clients
     print("Starting client thread")
@@ -103,12 +126,16 @@ def client():
                                             print("received index:", index)
                                             board[index] = this_turn.get_counter()
                                             print_board()
+                                            winner = check_win().split()
                                             if this_turn == match:
                                                 this_turn = client
                                             else:
                                                 this_turn = match
                                         else:
                                             this_turn.c.send("invalid_pos||{}||{}".format(this_turn.get_counter(), ",".join(x for x in board)).encode())
+                                print(winner, "wins!")
+                                match.c.send("over||{}||{}".format(winner, ",".join(x for x in board)).encode())
+                                client.c.send("over||{}||{}".format(winner, ",".join(x for x in board)).encode())
 
 clients = []
 board = [" "] * 9

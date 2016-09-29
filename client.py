@@ -141,12 +141,28 @@ def connect():
                     i = -1
                     clear()
                     print_board()
+                    print("You are ", c)
                     while i not in range(9):
                         i = int(input("Choose a position: ")) - 1
                     s.send(str(i).encode())
                     place(c, i)
                     clear()
                     print_board()
+                elif "over" in response:
+                    c = response.split("||")[1]  # counter
+                    b = response.split("||")[2]  # board raw data
+                    bc = b.split(",")  # board counters
+                    i = 0
+                    for nc in bc:  # for counter in board counters
+                        board[i] = nc  # place them on the board
+                        i += 1
+                    clear()
+                    print_board()
+                    print("Game Over!")
+                    print(c, "wins!")
+                    input("Press enter to quit.")
+                    quit()
+
         s.send("blah".encode())
     s.close()
     input("Lost connection to server. Press enter to quit.")
