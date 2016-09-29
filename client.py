@@ -1,4 +1,4 @@
-import os, random, sys
+import os, random, sys, socket, time
 
 def print_board():
     for n in range(0, 9, 3):
@@ -109,7 +109,48 @@ def offline():
     quit()
 
 def connect():
-    pass
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server = input("Server address: ")
+    port = 45001
+    data_buf = 4096
+    s.connect((server, port))
+    print("Searching for an opponent...")
+    while True:
+        data = s.recv(data_buf)
+        if not data:
+            break
+        response = data.decode("utf-8")
+        if response == "ready":
+            print("Opponent found...")
+            while True:
+                data = s.recv(data_buf)
+                if not data:
+                    break
+                response = data.decode("utf-8")
+                clear()
+                print_board()
+                if "go" in response or "invalid_pos" in response:
+                    c = response.split("||")[1] # counter
+                    b = response.split("||")[2] # board raw data
+                    bc = b.split(",") # board counters
+                    i = 0
+                    for nc in bc: # for counter in board counters
+                        board[i] = nc# place them on the board
+                        i += 1
+                    print("It is your turn")
+                    i = -1
+                    clear()
+                    print_board()
+                    while i not in range(9):
+                        i = int(input("Choose a position: ")) - 1
+                    s.send(str(i).encode())
+                    place(c, i)
+                    clear()
+                    print_board()
+        s.send("blah".encode())
+    s.close()
+    input("Lost connection to server. Press enter to quit.")
+    quit()
 
 if "idlelib.run" in sys.modules:
     idle = True
@@ -120,11 +161,11 @@ err_failure = 1
 err_success = 0
 
 empty = " "
-board = [empty, empty, empty,\
-         empty, empty, empty,\
+board = [empty, empty, empty,
+         empty, empty, empty,
          empty, empty, empty]
-options = ["Find a match",\
-           "Play offline",\
+options = ["Find a match",
+           "Play offline",
            "Quit"]
 # player_counter = "O"
 menu()
