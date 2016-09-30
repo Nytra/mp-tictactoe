@@ -66,7 +66,16 @@ def display_menu():
 
 def menu():
     display_menu()
-    choice = int(input("Choice: "))
+    choice = ""
+    while True:
+        try:
+            print("Choice: ", end="")
+            choice = int(input())
+            break
+        except:
+            clear()
+            display_menu()
+            continue
     if choice == 1: # find a match
         connect()
     elif choice == 2: # play offline
@@ -117,11 +126,18 @@ def offline():
 def connect():
     clear()
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server = input("Server address: ")
+    server = ""
+    while not server:
+        server = input("Server address: ")
     port = 45001
     data_buf = 4096
     print("Attempting to connect to server...")
-    s.connect((server, port))
+    try:
+        s.connect((server, port))
+    except:
+        print("Unable to connect to server.")
+        input("\nPress enter to quit.")
+        quit()
     print("Connection established.")
     print("Searching for an opponent...")
     while True:
@@ -153,8 +169,13 @@ def connect():
                     clear()
                     print_board()
                     print("You are ", c)
-                    while i not in range(9):
-                        i = int(input("Choose a position: ")) - 1
+                    while True:
+                        try:
+                            i = int(input("Choose a position: ")) - 1
+                        except:
+                            continue
+                        if i not in range(9):
+                            continue
                     s.send(str(i).encode())
                     place(c, i)
                     clear()
