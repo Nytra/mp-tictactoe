@@ -176,6 +176,7 @@ def connect():
                             continue
                         if i not in range(9):
                             continue
+                        break
                     s.send(str(i).encode())
                     place(c, i)
                     clear()
